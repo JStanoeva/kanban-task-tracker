@@ -1,114 +1,140 @@
-let taskIdCounter = 4; // Start counter after initial tasks
+(function() {
+    let taskIdCounter = 4; // Start counter after initial tasks
+    let tasks = [];
 
-// --- Task Adding ---
-const addTaskBtn = document.getElementById('addTaskBtn');
-const newTaskInput = document.getElementById('newTaskInput');
-const todoColumn = document.getElementById('todo').querySelector('.space-y-3'); // Target the task container div
+    document.addEventListener('DOMContentLoaded', init);
 
-addTaskBtn.addEventListener('click', addTask);
-newTaskInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        addTask();
-    }
-});
+    function init() {
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const newTaskInput = document.getElementById('newTaskInput');
+        const errorDisplay = document.getElementById('validationError');
+        const todoColumn = document.getElementById('todo').querySelector('.space-y-3');
 
-function addTask() {
-    const taskText = newTaskInput.value.trim();
-    if (taskText === '') {
-        alert('Please enter a task description!'); // Simple validation
-        return;
-    }
+        addTaskBtn.addEventListener('click', addTask);
+        newTaskInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
 
-    const newTask = document.createElement('div');
-    newTask.id = `task-${taskIdCounter++}`;
-    newTask.className = 'task-card p-3 shadow';
-    newTask.draggable = true;
-    newTask.textContent = taskText;
-    newTask.addEventListener('dragstart', drag);
+        document.querySelectorAll('.kanban-column').forEach(col => {
+            col.addEventListener('dragover', allowDrop);
+            col.addEventListener('drop', drop);
+            col.addEventListener('dragleave', dragLeave);
+        });
 
-    todoColumn.appendChild(newTask); // Add to the 'To Do' column's task container
-    newTaskInput.value = ''; // Clear input field
-}
+        document.querySelectorAll('.task-card').forEach(card => {
+            card.addEventListener('dragstart', drag);
+        });
 
+        loadTasks();
 
-// --- Drag and Drop Functionality ---
-function allowDrop(ev) {
-    ev.preventDefault(); // Necessary to allow dropping
-    ev.currentTarget.classList.add('drag-over'); // Add visual feedback
-}
+        function addTask() {
+            const taskText = newTaskInput.value.trim();
+            if (taskText === '') {
+                errorDisplay.textContent = 'Please enter a task description!';
+                errorDisplay.classList.remove('hidden');
+                return;
+            }
+            errorDisplay.classList.add('hidden');
 
-function dragLeave(ev) {
-     ev.currentTarget.classList.remove('drag-over'); // Remove visual feedback
-}
+            const id = `task-${taskIdCounter++}`;
+            createTaskElement(id, taskText, 'todo');
+            tasks.push({ id, text: taskText, column: 'todo' });
+            saveTasks();
+            newTaskInput.value = '';
+        }
 
-function drag(ev) {
-    ev.dataTransfer.setData("text/plain", ev.target.id); // Store the id of the dragged element
-    ev.target.classList.add('dragging'); // Add class for visual feedback during drag
-    // Use setTimeout to allow the browser to render the 'dragging' state before hiding
-    setTimeout(() => {
-         // Optional: hide the original element smoothly if desired, but opacity handles it well
-         // ev.target.style.visibility = 'hidden';
-    }, 0);
-}
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('drag-over');
+        }
 
-function drop(ev) {
-    ev.preventDefault();
-    const data = ev.dataTransfer.getData("text/plain");
-    const draggedElement = document.getElementById(data);
-    const dropTargetColumn = ev.currentTarget; // The column div
-    const dropTargetTasksContainer = dropTargetColumn.querySelector('.space-y-3'); // The div holding tasks
+        function dragLeave(ev) {
+            ev.currentTarget.classList.remove('drag-over');
+        }
 
-    // Ensure we are dropping onto a valid column and not onto a task card itself directly
-    if (dropTargetColumn.classList.contains('kanban-column') && draggedElement) {
-        // Remove drag-over styling
-        dropTargetColumn.classList.remove('drag-over');
+        function drag(ev) {
+            ev.dataTransfer.setData('text/plain', ev.target.id);
+            ev.target.classList.add('dragging');
+            setTimeout(() => {}, 0);
+        }
 
-        // Check if the task is being moved *to* the 'Done' column
-        const isMovingToDone = dropTargetColumn.id === 'done' && draggedElement.parentElement.parentElement.id !== 'done';
+        function drop(ev) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData('text/plain');
+            const draggedElement = document.getElementById(data);
+            const dropTargetColumn = ev.currentTarget;
+            const dropTargetTasksContainer = dropTargetColumn.querySelector('.space-y-3');
 
-        // Append the dragged element to the tasks container within the target column
-        dropTargetTasksContainer.appendChild(draggedElement);
+            if (dropTargetColumn.classList.contains('kanban-column') && draggedElement) {
+                dropTargetColumn.classList.remove('drag-over');
+                dropTargetTasksContainer.appendChild(draggedElement);
 
-        // Trigger confetti if moved to 'Done'
-        if (isMovingToDone) {
-            triggerConfetti();
+                const taskObj = tasks.find(t => t.id === draggedElement.id);
+                const wasDone = taskObj && taskObj.column === 'done';
+                if (taskObj) {
+                    taskObj.column = dropTargetColumn.id;
+                    saveTasks();
+                }
+                if (!wasDone && dropTargetColumn.id === 'done') {
+                    triggerConfetti();
+                }
+            }
+
+            if (draggedElement) {
+                draggedElement.classList.remove('dragging');
+            }
+        }
+
+        document.addEventListener('dragend', () => {
+            const draggedElement = document.querySelector('.dragging');
+            if (draggedElement) {
+                draggedElement.classList.remove('dragging');
+            }
+            document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
+        });
+
+        function triggerConfetti() {
+            confetti({
+                particleCount: 150,
+                spread: 90,
+                origin: { y: 0.6 },
+                colors: ['#a855f7', '#ec4899', '#fde047', '#ffffff', '#B76E79']
+            });
+        }
+
+        function createTaskElement(id, text, columnId) {
+            const newTask = document.createElement('div');
+            newTask.id = id;
+            newTask.className = 'task-card p-3 shadow';
+            newTask.draggable = true;
+            newTask.textContent = text;
+            newTask.addEventListener('dragstart', drag);
+            document.getElementById(columnId).querySelector('.space-y-3').appendChild(newTask);
+        }
+
+        function loadTasks() {
+            const stored = localStorage.getItem('tasks');
+            if (stored) {
+                tasks = JSON.parse(stored);
+                document.querySelectorAll('.kanban-column .space-y-3').forEach(col => col.innerHTML = '');
+                tasks.forEach(t => createTaskElement(t.id, t.text, t.column));
+                const maxId = tasks.reduce((m, t) => {
+                    const n = parseInt(t.id.split('-')[1], 10);
+                    return n > m ? n : m;
+                }, 3);
+                taskIdCounter = maxId + 1;
+            } else {
+                document.querySelectorAll('.task-card').forEach(card => {
+                    const col = card.closest('.kanban-column').id;
+                    tasks.push({ id: card.id, text: card.textContent.trim(), column: col });
+                });
+            }
+        }
+
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
         }
     }
-
-     // Clean up dragging class regardless of where it was dropped
-     if(draggedElement) {
-        draggedElement.classList.remove('dragging');
-        // Make sure the element is visible again if it was hidden
-        // draggedElement.style.visibility = 'visible';
-     }
-}
-
- // Add event listener to the document to clean up if drag ends outside a valid drop zone
- document.addEventListener('dragend', (ev) => {
-    const draggedElement = document.querySelector('.dragging');
-    if (draggedElement) {
-        draggedElement.classList.remove('dragging');
-        // draggedElement.style.visibility = 'visible'; // Ensure visibility
-    }
-    // Remove any lingering drag-over styles
-    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
- });
-
-
-// --- Confetti ---
-function triggerConfetti() {
-    console.log("Confetti time!"); // Debug log
-    confetti({
-        particleCount: 150, // More confetti!
-        spread: 90,         // Wider spread
-        origin: { y: 0.6 }, // Start slightly lower
-        colors: ['#a855f7', '#ec4899', '#fde047', '#ffffff', '#B76E79'] // Purple, Pink, Yellow, White, Rose Gold!
-    });
-}
-
-// --- Initial Setup ---
-// Add dragstart listeners to initially loaded tasks
-document.querySelectorAll('.task-card').forEach(card => {
-    card.addEventListener('dragstart', drag);
-});
-
+})();
