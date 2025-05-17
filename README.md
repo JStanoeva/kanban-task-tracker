@@ -1,4 +1,3 @@
-# kanban-task-tracker
 # 👑 Royal Kanban Task Tracker 🧀🎉
 
 Welcome to the Royal Kanban Task Tracker, a delightful and visually pleasing application designed to help you manage your noble quests, grand projects, and perhaps even your cheese-tasting schedule! Built with HTML, Tailwind CSS, and a sprinkle of JavaScript magic, this Kanban board is not only functional but also celebrates your achievements with a burst of confetti!
