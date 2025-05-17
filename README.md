@@ -27,6 +27,7 @@ Welcome to the Royal Kanban Task Tracker, a delightful and visually pleasing app
     * Type a task in the input field and click "Add Task" or press Enter.
     * Drag tasks from one column to another.
     * Watch the confetti fly when you complete a task!
+4.  **See it in action!** You can also try out the live version here: [Royal Kanban Task Tracker Live](https://jstanoeva.github.io/kanban-task-tracker/)
 
 ## 💖 Contributing
 
