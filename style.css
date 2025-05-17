@@ -6,6 +6,8 @@
     --primary-purple: #a855f7;
     --purple-hover: #9333ea;
     --drag-over-bg: #e9d5ff;
+    --progress-yellow: #f59e0b;
+    --progress-yellow-bg: #fef9c3;
     --rose-gold: #B76E79;
     --done-green: #10b981;
     --done-green-bg: #f0fdf4;
@@ -20,9 +22,13 @@ body {
     background-color: var(--white); /* White columns */
     border-radius: 0.75rem; /* Rounded corners for columns */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Soft shadow */
+    overflow-y: auto; /* Scroll if content exceeds height */
     transition: background-color 0.2s ease-in-out;
 }
 .task-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     cursor: grab; /* Indicate draggable */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     background-color: var(--card-light-purple); /* Very light purple cards */
@@ -53,6 +59,17 @@ body {
 .drag-over {
     background-color: var(--drag-over-bg); /* Highlight column when dragging over */
     border: 2px dashed var(--primary-purple); /* Dashed border */
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Delete button inside tasks */
+.delete-btn {
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+.delete-btn:hover {
+    color: #c53030;
 }
 /* Custom button style */
 .add-task-btn {
@@ -63,9 +80,9 @@ body {
 .add-task-btn:hover {
     background-color: var(--purple-hover); /* Darker purple on hover */
 }
-/* Rose gold accent (can be applied selectively) */
-.rose-gold-accent {
-    border-color: var(--rose-gold); /* A simple rose gold like color */
+.inprogress-column .task-card {
+    border-left-color: var(--progress-yellow);
+    background-color: var(--progress-yellow-bg);
 }
 .done-column .task-card {
      border-left-color: var(--done-green); /* Green border for done tasks */
