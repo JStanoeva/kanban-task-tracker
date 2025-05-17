@@ -1,37 +1,59 @@
 let taskIdCounter = 4; // Start counter after initial tasks
+const storageKey = 'kanbanTasks';
 
 // --- Task Adding ---
+const taskForm = document.getElementById('taskForm');
 const addTaskBtn = document.getElementById('addTaskBtn');
 const newTaskInput = document.getElementById('newTaskInput');
+const errorMsg = document.getElementById('errorMsg');
+const liveRegion = document.getElementById('liveRegion');
 const todoColumn = document.getElementById('todo').querySelector('.space-y-3'); // Task list container
 
-addTaskBtn.addEventListener('click', addTask);
-newTaskInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        addTask();
-    }
-});
+taskForm.addEventListener('submit', addTask);
 
-function addTask() {
+function addTask(e) {
+    e.preventDefault();
     const taskText = newTaskInput.value.trim();
     if (taskText === '') {
-        alert('Please enter a task description!'); // Simple validation
+        errorMsg.classList.remove('hidden');
         return;
     }
+    errorMsg.classList.add('hidden');
 
-    const newTask = document.createElement('li');
-    newTask.id = `task-${taskIdCounter++}`;
-    newTask.className = 'task-card p-3 shadow';
-    newTask.draggable = true;
-    newTask.setAttribute('role', 'listitem');
-    newTask.setAttribute('aria-grabbed', 'false');
-    newTask.textContent = taskText;
-    newTask.addEventListener('dragstart', drag);
-
+    const newTask = createTaskElement(`task-${taskIdCounter++}`, taskText);
     todoColumn.appendChild(newTask); // Add to the 'To Do' column's task container
     newTask.classList.add('task-moving');
     setTimeout(() => newTask.classList.remove('task-moving'), 300);
-    newTaskInput.value = ''; // Clear input field
+
+    liveRegion.textContent = `Added task: ${taskText}`;
+    newTaskInput.value = '';
+    saveTasks();
+}
+
+function createTaskElement(id, text) {
+    const li = document.createElement('li');
+    li.id = id;
+    li.className = 'task-card p-3 shadow flex justify-between items-center';
+    li.draggable = true;
+    li.setAttribute('role', 'listitem');
+    li.setAttribute('aria-grabbed', 'false');
+
+    const span = document.createElement('span');
+    span.className = 'task-text';
+    span.textContent = text;
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'delete-btn text-red-600 ml-2';
+    delBtn.setAttribute('aria-label', 'Delete task');
+    delBtn.innerHTML = '&times;';
+    delBtn.addEventListener('click', () => {
+        li.remove();
+        saveTasks();
+    });
+
+    li.appendChild(span);
+    li.appendChild(delBtn);
+    return li;
 }
 
 
@@ -61,7 +83,7 @@ function drop(ev) {
     const data = ev.dataTransfer.getData("text/plain");
     const draggedElement = document.getElementById(data);
     const dropTargetColumn = ev.currentTarget; // The column div
-    const dropTargetTasksContainer = dropTargetColumn.querySelector('.space-y-3'); // The div holding tasks
+    const dropTargetTasksContainer = dropTargetColumn.querySelector('.space-y-3');
 
     // Ensure we are dropping onto a valid column and not onto a task card itself directly
     if (dropTargetColumn.classList.contains('kanban-column') && draggedElement) {
@@ -69,7 +91,7 @@ function drop(ev) {
         dropTargetColumn.classList.remove('drag-over');
 
         // Check if the task is being moved *to* the 'Done' column
-        const isMovingToDone = dropTargetColumn.id === 'done' && draggedElement.parentElement.parentElement.id !== 'done';
+        const isMovingToDone = dropTargetColumn.id === 'done' && draggedElement.closest('section').id !== 'done';
 
         // Append the dragged element to the tasks container within the target column
         dropTargetTasksContainer.appendChild(draggedElement);
@@ -80,6 +102,8 @@ function drop(ev) {
         if (isMovingToDone) {
             triggerConfetti();
         }
+        liveRegion.textContent = `Moved task to ${dropTargetColumn.id}`;
+        saveTasks();
     }
 
      // Clean up dragging class regardless of where it was dropped
@@ -115,17 +139,49 @@ function triggerConfetti() {
 }
 
 // --- Initial Setup ---
-// Add dragstart listeners to initially loaded tasks
-document.querySelectorAll('.task-card').forEach(card => {
-    card.addEventListener('dragstart', drag);
-    card.setAttribute('role', 'listitem');
-    card.setAttribute('aria-grabbed', 'false');
-});
+function attachColumnEvents() {
+    document.querySelectorAll('.kanban-column').forEach(column => {
+        column.addEventListener('dragover', allowDrop);
+        column.addEventListener('drop', drop);
+        column.addEventListener('dragleave', dragLeave);
+        column.querySelector('.space-y-3').addEventListener('dragstart', e => {
+            if (e.target.classList.contains('task-card')) {
+                drag(e);
+            }
+        });
+    });
+}
 
-// Attach drag events to kanban columns
-document.querySelectorAll('.kanban-column').forEach(column => {
-    column.addEventListener('dragover', allowDrop);
-    column.addEventListener('drop', drop);
-    column.addEventListener('dragleave', dragLeave);
-});
+function loadTasks() {
+    const saved = localStorage.getItem(storageKey);
+    if (!saved) return false;
+    const board = JSON.parse(saved);
+    Object.keys(board).forEach(columnId => {
+        const container = document.querySelector(`#${columnId} .space-y-3`);
+        container.innerHTML = '';
+        board[columnId].forEach(task => {
+            const li = createTaskElement(task.id, task.text);
+            container.appendChild(li);
+            const num = parseInt(task.id.split('-')[1]);
+            if (num >= taskIdCounter) taskIdCounter = num + 1;
+        });
+    });
+}
+
+function saveTasks() {
+    const board = { todo: [], inprogress: [], done: [] };
+    document.querySelectorAll('.kanban-column').forEach(section => {
+        const columnId = section.id;
+        section.querySelectorAll('.task-card').forEach(li => {
+            const text = li.querySelector('.task-text').textContent;
+            board[columnId].push({ id: li.id, text });
+        });
+    });
+    localStorage.setItem(storageKey, JSON.stringify(board));
+}
+
+attachColumnEvents();
+if (!loadTasks()) {
+    saveTasks();
+}
 
