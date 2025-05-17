@@ -3,7 +3,7 @@ let taskIdCounter = 4; // Start counter after initial tasks
 // --- Task Adding ---
 const addTaskBtn = document.getElementById('addTaskBtn');
 const newTaskInput = document.getElementById('newTaskInput');
-const todoColumn = document.getElementById('todo').querySelector('.space-y-3'); // Target the task container div
+const todoColumn = document.getElementById('todo').querySelector('.space-y-3'); // Task list container
 
 addTaskBtn.addEventListener('click', addTask);
 newTaskInput.addEventListener('keypress', function(e) {
@@ -19,10 +19,12 @@ function addTask() {
         return;
     }
 
-    const newTask = document.createElement('div');
+    const newTask = document.createElement('li');
     newTask.id = `task-${taskIdCounter++}`;
     newTask.className = 'task-card p-3 shadow';
     newTask.draggable = true;
+    newTask.setAttribute('role', 'listitem');
+    newTask.setAttribute('aria-grabbed', 'false');
     newTask.textContent = taskText;
     newTask.addEventListener('dragstart', drag);
 
@@ -46,6 +48,7 @@ function dragLeave(ev) {
 function drag(ev) {
     ev.dataTransfer.setData("text/plain", ev.target.id); // Store the id of the dragged element
     ev.target.classList.add('dragging'); // Add class for visual feedback during drag
+    ev.target.setAttribute('aria-grabbed', 'true');
     // Use setTimeout to allow the browser to render the 'dragging' state before hiding
     setTimeout(() => {
          // Optional: hide the original element smoothly if desired, but opacity handles it well
@@ -88,10 +91,11 @@ function drop(ev) {
 }
 
  // Add event listener to the document to clean up if drag ends outside a valid drop zone
- document.addEventListener('dragend', (ev) => {
+document.addEventListener('dragend', (ev) => {
     const draggedElement = document.querySelector('.dragging');
     if (draggedElement) {
         draggedElement.classList.remove('dragging');
+        draggedElement.setAttribute('aria-grabbed', 'false');
         // draggedElement.style.visibility = 'visible'; // Ensure visibility
     }
     // Remove any lingering drag-over styles
@@ -114,5 +118,14 @@ function triggerConfetti() {
 // Add dragstart listeners to initially loaded tasks
 document.querySelectorAll('.task-card').forEach(card => {
     card.addEventListener('dragstart', drag);
+    card.setAttribute('role', 'listitem');
+    card.setAttribute('aria-grabbed', 'false');
+});
+
+// Attach drag events to kanban columns
+document.querySelectorAll('.kanban-column').forEach(column => {
+    column.addEventListener('dragover', allowDrop);
+    column.addEventListener('drop', drop);
+    column.addEventListener('dragleave', dragLeave);
 });
 
