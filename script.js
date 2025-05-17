@@ -27,6 +27,8 @@ function addTask() {
     newTask.addEventListener('dragstart', drag);
 
     todoColumn.appendChild(newTask); // Add to the 'To Do' column's task container
+    newTask.classList.add('task-moving');
+    setTimeout(() => newTask.classList.remove('task-moving'), 300);
     newTaskInput.value = ''; // Clear input field
 }
 
@@ -68,6 +70,8 @@ function drop(ev) {
 
         // Append the dragged element to the tasks container within the target column
         dropTargetTasksContainer.appendChild(draggedElement);
+        draggedElement.classList.add('task-moving');
+        setTimeout(() => draggedElement.classList.remove('task-moving'), 300);
 
         // Trigger confetti if moved to 'Done'
         if (isMovingToDone) {

@@ -1,11 +1,23 @@
 /* Custom styles for drag feedback and column height */
+:root {
+    --bg-light-purple: #f3e8ff;
+    --white: #ffffff;
+    --card-light-purple: #faf5ff;
+    --primary-purple: #a855f7;
+    --purple-hover: #9333ea;
+    --drag-over-bg: #e9d5ff;
+    --rose-gold: #B76E79;
+    --done-green: #10b981;
+    --done-green-bg: #f0fdf4;
+}
+
 body {
     font-family: 'Inter', sans-serif; /* Using Inter font */
-    background-color: #f3e8ff; /* Light purple background */
+    background-color: var(--bg-light-purple); /* Light purple background */
 }
 .kanban-column {
     min-height: 400px; /* Ensure columns have a minimum height */
-    background-color: #ffffff; /* White columns */
+    background-color: var(--white); /* White columns */
     border-radius: 0.75rem; /* Rounded corners for columns */
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Soft shadow */
     transition: background-color 0.2s ease-in-out;
@@ -13,9 +25,22 @@ body {
 .task-card {
     cursor: grab; /* Indicate draggable */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    background-color: #faf5ff; /* Very light purple cards */
-    border-left: 4px solid #a855f7; /* Purple left border */
+    background-color: var(--card-light-purple); /* Very light purple cards */
+    border-left: 4px solid var(--primary-purple); /* Purple left border */
     border-radius: 0.5rem; /* Rounded corners for cards */
+}
+.task-moving {
+    animation: task-move 0.3s ease;
+}
+@keyframes task-move {
+    from { transform: translateY(-10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .task-moving {
+        animation: none;
+    }
 }
 .task-card:active {
     cursor: grabbing; /* Indicate grabbing */
@@ -26,25 +51,25 @@ body {
     opacity: 0.5; /* Make dragged item semi-transparent */
 }
 .drag-over {
-    background-color: #e9d5ff; /* Highlight column when dragging over */
-    border: 2px dashed #a855f7; /* Dashed border */
+    background-color: var(--drag-over-bg); /* Highlight column when dragging over */
+    border: 2px dashed var(--primary-purple); /* Dashed border */
 }
 /* Custom button style */
 .add-task-btn {
-    background-color: #a855f7; /* Purple button */
+    background-color: var(--primary-purple); /* Purple button */
     color: white;
     transition: background-color 0.3s ease;
 }
 .add-task-btn:hover {
-    background-color: #9333ea; /* Darker purple on hover */
+    background-color: var(--purple-hover); /* Darker purple on hover */
 }
 /* Rose gold accent (can be applied selectively) */
 .rose-gold-accent {
-    border-color: #B76E79; /* A simple rose gold like color */
+    border-color: var(--rose-gold); /* A simple rose gold like color */
 }
 .done-column .task-card {
-     border-left-color: #10b981; /* Green border for done tasks */
-     background-color: #f0fdf4; /* Light green background */
+     border-left-color: var(--done-green); /* Green border for done tasks */
+     background-color: var(--done-green-bg); /* Light green background */
 }
 
 /* Ensure columns stack nicely on smaller screens */
