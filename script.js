@@ -33,7 +33,7 @@ function addTask(e) {
 function createTaskElement(id, text) {
     const li = document.createElement('li');
     li.id = id;
-    li.className = 'task-card p-3 shadow flex justify-between items-center';
+    li.className = 'task-card';
     li.draggable = true;
     li.setAttribute('role', 'listitem');
     li.setAttribute('aria-grabbed', 'false');
@@ -43,7 +43,7 @@ function createTaskElement(id, text) {
     span.textContent = text;
 
     const delBtn = document.createElement('button');
-    delBtn.className = 'delete-btn text-red-600 ml-2';
+    delBtn.className = 'delete-btn';
     delBtn.setAttribute('aria-label', 'Delete task');
     delBtn.innerHTML = '&times;';
     delBtn.addEventListener('click', () => {

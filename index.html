@@ -13,128 +13,89 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/svg+xml" href="img/favicon.png" />
   </head>
-  <body class="p-4 md:p-8">
-    <header class="text-center mb-8">
-      <h1 class="text-3xl md:text-4xl font-bold text-purple-700">
-        👑 Royal Kanban Task Tracker 👑
-      </h1>
-      <p class="text-purple-600 mt-2">Organize your noble quests!</p>
-    </header>
+  <body class="app-body">
+    <div class="app-shell">
+      <header class="app-header glass-panel">
+        <h1 class="app-title">Royal Kanban Task Tracker</h1>
+        <p class="app-subtitle">
+          Organize your noble quests with a touch of starlight.
+        </p>
+      </header>
 
-    <form
-      id="taskForm"
-      class="mb-8 p-4 bg-white rounded-lg shadow-md max-w-md mx-auto"
-    >
-      <h2 class="text-xl font-semibold mb-3 text-purple-700">Add New Task</h2>
-      <label for="newTaskInput" class="block mb-1 font-medium"
-        >Task Description</label
-      >
-      <input
-        type="text"
-        id="newTaskInput"
-        placeholder="Enter task description..."
-        class="w-full p-2 border border-gray-300 rounded-md mb-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-      />
-      <p id="errorMsg" class="text-red-600 text-sm mb-2 hidden">
-        Please enter a task description!
-      </p>
-      <button
-        id="addTaskBtn"
-        class="w-full add-task-btn font-bold py-2 px-4 rounded-md"
-        type="submit"
-      >
-        Add Task
-      </button>
-    </form>
-    <div id="liveRegion" class="sr-only" aria-live="polite"></div>
+      <form id="taskForm" class="task-form glass-panel">
+        <div class="form-heading">
+          <h2 class="section-title">Add New Task</h2>
+          <p class="section-subtitle">Capture the next quest on your board.</p>
+        </div>
+        <label for="newTaskInput" class="input-label">Task Description</label>
+        <input
+          type="text"
+          id="newTaskInput"
+          placeholder="Enter task description..."
+          class="task-input"
+        />
+        <p id="errorMsg" class="error-message hidden">
+          Please enter a task description!
+        </p>
+        <button id="addTaskBtn" class="add-task-btn" type="submit">
+          Add Task
+        </button>
+      </form>
 
-    <main class="kanban-board">
-      <section id="todo" class="kanban-column p-4" aria-label="To Do">
-        <h2
-          class="text-xl font-semibold mb-4 text-center text-purple-700 border-b-2 border-purple-200 pb-2"
-        >
-          To Do 📝
-        </h2>
-        <ul class="space-y-3 min-h-[50px]" role="list">
-          <li
-            id="task-1"
-            class="task-card p-3 shadow flex justify-between items-center"
-            draggable="true"
-            role="listitem"
-            aria-grabbed="false"
-          >
-            <span class="task-text">Plan the Grand Cheese Festival</span>
-            <button
-              class="delete-btn text-red-600 ml-2"
-              aria-label="Delete task"
-            >
-              &times;
-            </button>
-          </li>
-        </ul>
-      </section>
+      <div id="liveRegion" class="sr-only" aria-live="polite"></div>
 
-      <section
-        id="inprogress"
-        class="kanban-column p-4"
-        aria-label="In Progress"
-      >
-        <h2
-          class="text-xl font-semibold mb-4 text-center text-yellow-600 border-b-2 border-yellow-200 pb-2"
-        >
-          In Progress 🏃
-        </h2>
-        <ul class="space-y-3 min-h-[50px]" role="list">
-          <li
-            id="task-2"
-            class="task-card p-3 shadow rose-gold-accent flex justify-between items-center"
-            draggable="true"
-            role="listitem"
-            aria-grabbed="false"
-          >
-            <span class="task-text"
-              >Design new Royal Cheese Knight armor (with rose gold
-              accents!)</span
+      <main class="kanban-board">
+        <section id="todo" class="kanban-column glass-panel" aria-label="To Do">
+          <h2 class="column-title column-title--todo">To Do &#10024;</h2>
+          <ul class="space-y-3" role="list">
+            <li
+              id="task-1"
+              class="task-card"
+              draggable="true"
+              role="listitem"
+              aria-grabbed="false"
             >
-            <button
-              class="delete-btn text-red-600 ml-2"
-              aria-label="Delete task"
-            >
-              &times;
-            </button>
-          </li>
-        </ul>
-      </section>
+              <span class="task-text">Plan the Grand Cheese Festival</span>
+              <button class="delete-btn" aria-label="Delete task">&times;</button>
+            </li>
+          </ul>
+        </section>
 
-      <section
-        id="done"
-        class="kanban-column done-column p-4"
-        aria-label="Done"
-      >
-        <h2
-          class="text-xl font-semibold mb-4 text-center text-green-600 border-b-2 border-green-200 pb-2"
-        >
-          Done 🎉
-        </h2>
-        <ul class="space-y-3 min-h-[50px]" role="list">
-          <li
-            id="task-3"
-            class="task-card p-3 shadow flex justify-between items-center"
-            draggable="true"
-            role="listitem"
-            aria-grabbed="false"
-          >
-            <span class="task-text">Taste test the new Parmesan variety</span>
-            <button
-              class="delete-btn text-red-600 ml-2"
-              aria-label="Delete task"
+        <section id="inprogress" class="kanban-column glass-panel" aria-label="In Progress">
+          <h2 class="column-title column-title--progress">In Progress &#9889;</h2>
+          <ul class="space-y-3" role="list">
+            <li
+              id="task-2"
+              class="task-card rose-gold-accent"
+              draggable="true"
+              role="listitem"
+              aria-grabbed="false"
             >
-              &times;
-            </button>
-          </li>
-        </ul>
-      </section>
-    </main>
+              <span class="task-text"
+                >Design new Royal Cheese Knight armor (with rose gold accents!)</span
+              >
+              <button class="delete-btn" aria-label="Delete task">&times;</button>
+            </li>
+          </ul>
+        </section>
+
+        <section id="done" class="kanban-column glass-panel done-column" aria-label="Done">
+          <h2 class="column-title column-title--done">Done &#9989;</h2>
+          <ul class="space-y-3" role="list">
+            <li
+              id="task-3"
+              class="task-card"
+              draggable="true"
+              role="listitem"
+              aria-grabbed="false"
+            >
+              <span class="task-text">Taste test the new Parmesan variety</span>
+              <button class="delete-btn" aria-label="Delete task">&times;</button>
+            </li>
+          </ul>
+        </section>
+      </main>
+    </div>
 
     <script src="script.js"></script>
   </body>

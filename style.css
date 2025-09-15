@@ -1,104 +1,445 @@
-/* Custom styles for drag feedback and column height */
 :root {
-    --bg-light-purple: #f3e8ff;
-    --white: #ffffff;
-    --card-light-purple: #faf5ff;
-    --primary-purple: #a855f7;
-    --purple-hover: #9333ea;
-    --drag-over-bg: #e9d5ff;
-    --rose-gold: #B76E79;
-    --done-green: #10b981;
-    --done-green-bg: #f0fdf4;
+    --app-bg: #050815;
+    --app-bg-alt: #0b1220;
+    --glass-bg: rgba(15, 23, 42, 0.55);
+    --glass-hover: rgba(30, 41, 59, 0.68);
+    --glass-border: rgba(148, 163, 184, 0.22);
+    --glass-border-strong: rgba(148, 163, 184, 0.4);
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --accent-purple: #8b5cf6;
+    --accent-cyan: #22d3ee;
+    --accent-rose: #f472b6;
+    --accent-green: #34d399;
+    --task-bg: rgba(148, 163, 184, 0.1);
+    --task-border: rgba(99, 102, 241, 0.55);
+    --drag-over: rgba(79, 70, 229, 0.25);
+    --input-bg: rgba(15, 23, 42, 0.7);
+    --input-border: rgba(148, 163, 184, 0.35);
+    --shadow-strong: rgba(2, 8, 33, 0.75);
 }
 
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
 body {
-    font-family: 'Inter', sans-serif; /* Using Inter font */
-    background-color: var(--bg-light-purple); /* Light purple background */
+    height: 100%;
 }
+
+.app-body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--app-bg), var(--app-bg-alt));
+    color: var(--text-primary);
+    margin: 0;
+    min-height: 100%;
+    padding: clamp(1.5rem, 5vw, 4rem) clamp(1rem, 4vw, 3rem);
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-x: hidden;
+}
+
+.app-body::before {
+    content: '';
+    position: fixed;
+    inset: -20%;
+    background:
+        radial-gradient(circle at 20% 15%, rgba(139, 92, 246, 0.55), transparent 60%),
+        radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.4), transparent 55%),
+        radial-gradient(circle at 50% 95%, rgba(236, 72, 153, 0.35), transparent 62%);
+    opacity: 0.75;
+    transform: translate3d(0, 0, 0) scale(1);
+    animation: auroraDrift 28s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: -2;
+}
+
+.app-body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 18% 32%, rgba(255, 255, 255, 0.08), transparent 35%),
+        radial-gradient(circle at 82% 72%, rgba(148, 163, 184, 0.08), transparent 40%);
+    opacity: 0.45;
+    mix-blend-mode: screen;
+    animation: pulseGlow 16s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes auroraDrift {
+    0% {
+        transform: translate3d(-3%, -2%, 0) scale(1.05);
+    }
+    50% {
+        transform: translate3d(3%, 2%, 0) scale(1.08);
+    }
+    100% {
+        transform: translate3d(-2%, 4%, 0) scale(1.03);
+    }
+}
+
+@keyframes pulseGlow {
+    0% {
+        opacity: 0.28;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.55;
+        transform: scale(1.06);
+    }
+    100% {
+        opacity: 0.38;
+        transform: scale(1.1);
+    }
+}
+
+.app-shell {
+    width: min(1100px, 100%);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    position: relative;
+    z-index: 1;
+}
+
+.glass-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.2rem;
+    box-shadow: 0 25px 45px -35px var(--shadow-strong);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, border-color 0.35s ease;
+}
+
+.glass-panel:hover {
+    background: var(--glass-hover);
+    border-color: var(--glass-border-strong);
+    transform: translateY(-4px);
+    box-shadow: 0 30px 60px -30px rgba(2, 8, 33, 0.85);
+}
+
+.app-header {
+    text-align: center;
+    padding: clamp(1.75rem, 4vw, 2.75rem);
+    position: relative;
+    overflow: hidden;
+}
+
+.app-header::after {
+    content: '';
+    position: absolute;
+    inset: 1.5px;
+    border-radius: inherit;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    pointer-events: none;
+}
+
+.app-header.glass-panel:hover {
+    transform: none;
+    box-shadow: 0 25px 45px -35px var(--shadow-strong);
+}
+
+.app-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin: 0;
+}
+
+.app-subtitle {
+    margin: 0.9rem auto 0;
+    color: var(--text-secondary);
+    max-width: 32rem;
+    line-height: 1.6;
+}
+
+.task-form {
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.section-title {
+    margin: 0;
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+}
+
+.section-subtitle {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.input-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.task-input {
+    width: 100%;
+    border: 1px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text-primary);
+    padding: 0.95rem 1rem;
+    border-radius: 0.9rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.task-input::placeholder {
+    color: rgba(148, 163, 184, 0.65);
+}
+
+.task-input:focus {
+    outline: none;
+    border-color: rgba(129, 140, 248, 0.55);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    background: rgba(15, 23, 42, 0.85);
+}
+
+.error-message {
+    color: #fb7185;
+    font-size: 0.85rem;
+    margin-top: -0.35rem;
+}
+
+.add-task-btn {
+    border: none;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.95));
+    color: var(--text-primary);
+    font-weight: 600;
+    padding: 0.95rem 1rem;
+    border-radius: 0.9rem;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+    box-shadow: 0 17px 35px -22px rgba(129, 140, 248, 0.9);
+}
+
+.add-task-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px -20px rgba(129, 140, 248, 0.95);
+    filter: brightness(1.05);
+}
+
+.add-task-btn:active {
+    transform: translateY(0);
+    filter: brightness(0.95);
+}
+
+.add-task-btn:focus-visible {
+    outline: 2px solid rgba(56, 189, 248, 0.85);
+    outline-offset: 3px;
+}
+
+.kanban-board {
+    display: grid;
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+@media (min-width: 768px) {
+    .kanban-board {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
 .kanban-column {
-    min-height: 400px; /* Ensure columns have a minimum height */
-    background-color: var(--white); /* White columns */
-    border-radius: 0.75rem; /* Rounded corners for columns */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Soft shadow */
-    overflow-y: auto; /* Scroll if content exceeds height */
-    transition: background-color 0.2s ease-in-out;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    display: flex;
+    flex-direction: column;
+    min-height: 420px;
+    position: relative;
 }
+
+.kanban-column::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    pointer-events: none;
+}
+
+.kanban-column:hover::before {
+    border-color: rgba(148, 163, 184, 0.25);
+}
+
+.column-title {
+    margin: 0 0 1.5rem;
+    font-size: 1.1rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.column-title--todo {
+    color: rgba(129, 140, 248, 0.95);
+}
+
+.column-title--progress {
+    color: rgba(56, 189, 248, 0.9);
+}
+
+.column-title--done {
+    color: rgba(34, 197, 94, 0.9);
+}
+
+.kanban-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    flex: 1;
+}
+
 .task-card {
     display: flex;
+    align-items: flex-start;
     justify-content: space-between;
-    align-items: center;
-    cursor: grab; /* Indicate draggable */
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    background-color: var(--card-light-purple); /* Very light purple cards */
-    border-left: 4px solid var(--primary-purple); /* Purple left border */
-    border-radius: 0.5rem; /* Rounded corners for cards */
+    gap: 0.75rem;
+    padding: 1rem 1.15rem;
+    background: var(--task-bg);
+    border-radius: 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-left: 4px solid var(--task-border);
+    transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+    cursor: grab;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
+
+.task-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 25px 40px -28px rgba(15, 23, 42, 0.85);
+    border-color: rgba(129, 140, 248, 0.8);
+    background: rgba(148, 163, 184, 0.16);
+}
+
+.task-card:active {
+    cursor: grabbing;
+    transform: scale(0.98);
+}
+
+.task-text {
+    flex: 1;
+    line-height: 1.5;
+}
+
+.delete-btn {
+    border: none;
+    background: rgba(15, 23, 42, 0.45);
+    color: rgba(248, 250, 252, 0.72);
+    border-radius: 50%;
+    width: 2.25rem;
+    height: 2.25rem;
+    display: grid;
+    place-items: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.delete-btn:hover {
+    background: rgba(239, 68, 68, 0.22);
+    color: #f87171;
+    transform: scale(1.05);
+}
+
+.delete-btn:focus-visible {
+    outline: 2px solid rgba(248, 113, 113, 0.6);
+    outline-offset: 2px;
+}
+
 .task-moving {
     animation: task-move 0.3s ease;
 }
+
 @keyframes task-move {
-    from { transform: translateY(-10px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+    from {
+        transform: translateY(-12px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.dragging {
+    opacity: 0.55;
+}
+
+.drag-over {
+    border-color: rgba(129, 140, 248, 0.45);
+    box-shadow: inset 0 0 0 1px rgba(129, 140, 248, 0.25);
+    background: var(--drag-over);
+}
+
+.rose-gold-accent {
+    border-left-color: rgba(251, 191, 183, 0.9);
+}
+
+.done-column .task-card {
+    border-left-color: rgba(74, 222, 128, 0.7);
+    background: rgba(34, 197, 94, 0.12);
+}
+
+.done-column .task-card:hover {
+    border-color: rgba(74, 222, 128, 0.85);
+    background: rgba(34, 197, 94, 0.18);
+}
+
+@media (max-width: 768px) {
+    .app-body {
+        padding: clamp(1.25rem, 5vw, 2rem) clamp(0.75rem, 4vw, 1.5rem);
+    }
+
+    .glass-panel:hover {
+        transform: none;
+        box-shadow: 0 25px 45px -35px var(--shadow-strong);
+    }
+
+    .task-card:hover {
+        transform: translateY(-2px);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .app-body::before,
+    .app-body::after {
+        animation: none;
+    }
+
+    .glass-panel,
+    .task-card,
+    .add-task-btn {
+        transition: none;
+    }
+
     .task-moving {
         animation: none;
     }
 }
-.task-card:active {
-    cursor: grabbing; /* Indicate grabbing */
-    transform: scale(1.03);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-.dragging {
-    opacity: 0.5; /* Make dragged item semi-transparent */
-}
-.drag-over {
-    background-color: var(--drag-over-bg); /* Highlight column when dragging over */
-    border: 2px dashed var(--primary-purple); /* Dashed border */
-    transition: background-color 0.2s ease, border-color 0.2s ease;
-}
 
-/* Delete button inside tasks */
-.delete-btn {
-    font-size: 1.25rem;
-    line-height: 1;
-    transition: color 0.2s ease;
-}
-.delete-btn:hover {
-    color: #c53030;
-}
-/* Custom button style */
-.add-task-btn {
-    background-color: var(--primary-purple); /* Purple button */
-    color: white;
-    transition: background-color 0.3s ease;
-}
-.add-task-btn:hover {
-    background-color: var(--purple-hover); /* Darker purple on hover */
-}
-/* Rose gold accent (can be applied selectively) */
-.rose-gold-accent {
-    border-color: var(--rose-gold); /* A simple rose gold like color */
-}
-.done-column .task-card {
-     border-left-color: var(--done-green); /* Green border for done tasks */
-     background-color: var(--done-green-bg); /* Light green background */
-}
-
-/* Ensure columns stack nicely on smaller screens */
-.kanban-board {
-    display: flex;
-    flex-direction: column; /* Stack columns vertically by default */
-    gap: 1rem; /* Space between columns */
-}
-/* Switch to horizontal layout on medium screens and up */
-@media (min-width: 768px) { /* md breakpoint */
-    .kanban-board {
-        flex-direction: row; /* Arrange columns horizontally */
-    }
-    .kanban-column {
-        flex: 1; /* Make columns share space equally */
+@supports not ((backdrop-filter: blur(18px)) or (-webkit-backdrop-filter: blur(18px))) {
+    .glass-panel,
+    .task-card {
+        background: rgba(15, 23, 42, 0.88);
     }
 }
